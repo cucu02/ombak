@@ -20,3 +20,8 @@
   border: 1px solid #343a40; 
   border-radius: 5px;
 }
+
+#map {
+  height: 300px;
+  border-radius: 5px;
+}
