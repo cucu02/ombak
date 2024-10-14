@@ -1,28 +1,39 @@
 var latitude = 3.0425383902202046;
 var longitude = 100.40256180187565;
 
-var map = L.map('map').setView([latitude, longitude], 8); // Inisialisasi peta
+var map = L.map('map').setView([latitude, longitude], 8); // Inisialisasi peta dengan zoom out
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
 }).addTo(map);
 
-var marker = L.marker([latitude, longitude]).addTo(map); // Marker di peta
+var marker = L.marker([latitude, longitude]).addTo(map); // Tambahkan marker
 
 var api_url = `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&hourly=wave_height&timezone=Asia%2FBangkok`;
+
+function determineWaveCategory(waveHeight) {
+  if (waveHeight <= 0.5) {
+    return { category: 'Aman', color: '#28a745' }; // Hijau untuk aman
+  } else if (waveHeight <= 1.5) {
+    return { category: 'Moderate', color: '#ffc107' }; // Kuning untuk moderate
+  } else if (waveHeight <= 3) {
+    return { category: 'Tinggi', color: '#fd7e14' }; // Oranye untuk tinggi
+  } else {
+    return { category: 'Berbahaya', color: '#dc3545' }; // Merah untuk berbahaya
+  }
+}
 
 fetch(api_url)
   .then(response => response.json())
   .then(marineData => {
-    const hourlyTime = marineData.hourly.time;
-    const waveHeights = marineData.hourly.wave_height;
-    const latitude = marineData.latitude;
-    const longitude = marineData.longitude;
+    const waveHeight = marineData.hourly.wave_height[0];
+    const { category, color } = determineWaveCategory(waveHeight);
 
-    document.getElementById('waveHeight').innerHTML = `<b>Latest Wave Height:</b> ${waveHeights[0]} m`;
+    document.getElementById('waveHeight').innerHTML = `<b>Latest Wave Height:</b> ${waveHeight} m (${category})`;
+    document.getElementById('backgroundDiv').style.backgroundColor = color; // Ganti warna latar
     document.getElementById('coordinate').innerHTML = `<b>Latitude:</b> ${latitude}, <b>Longitude:</b> ${longitude}`;
 
-    populateForecastTable(hourlyTime, waveHeights);
+    populateForecastTable(marineData.hourly.time, marineData.hourly.wave_height);
   })
   .catch(error => {
     console.error('Error fetching marine data:', error);
@@ -47,19 +58,24 @@ function updateData() {
   fetch(api_url)
     .then(response => response.json())
     .then(marineData => {
-      const hourlyTime = marineData.hourly.time;
-      const waveHeights = marineData.hourly.wave_height;
-      document.getElementById('waveHeight').innerHTML = `<b>Latest Wave Height:</b> ${waveHeights[0]} m`;
+      const waveHeight = marineData.hourly.wave_height[0];
+      const { category, color } = determineWaveCategory(waveHeight);
+
+      document.getElementById('waveHeight').innerHTML = `<b>Latest Wave Height:</b> ${waveHeight} m (${category})`;
+      document.getElementById('backgroundDiv').style.backgroundColor = color; // Ganti warna latar
       document.getElementById('coordinate').innerHTML = `<b>Latitude:</b> ${latitude}, <b>Longitude:</b> ${longitude}`;
-      populateForecastTable(hourlyTime, waveHeights);
+
+      map.setView([latitude, longitude], 8); // Update peta
+      marker.setLatLng([latitude, longitude]); // Pindahkan marker
+
+      populateForecastTable(marineBerikut adalah lanjutan dari kode JavaScript sebelumnya untuk memastikan peta, warna, dan kategori bahaya ombak diperbarui dengan benar berdasarkan tinggi ombak yang diperoleh dari **Marine API**:
+
+```javascript
+      populateForecastTable(marineData.hourly.time, marineData.hourly.wave_height);
     })
     .catch(error => {
       console.error('Error fetching marine data:', error);
     });
-
-  // Update the map and marker position
-  map.setView([latitude, longitude], 10);
-  marker.setLatLng([latitude, longitude]);
 
   fetchLocationData();
 }
