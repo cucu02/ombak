@@ -59,4 +59,37 @@ function updateData() {
 
   // Update the map and marker position
   map.setView([latitude, longitude], 10);
-  marke
+  marker.setLatLng([latitude, longitude]);
+
+  fetchLocationData();
+}
+
+function fetchLocationData() {
+  var osm = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+
+  fetch(osm)
+    .then(response => response.json())
+    .then(locationData => {
+      const displayName = locationData.display_name || 'Location not found';
+      document.getElementById('location').innerHTML = displayName;
+    })
+    .catch(error => {
+      console.error('Error fetching location data:', error);
+    });
+}
+
+function populateForecastTable(hourlyTime, waveHeights) {
+  const tableBody = document.getElementById('forecastTableBody');
+  tableBody.innerHTML = ''; // Clear table
+  hourlyTime.forEach((time, index) => {
+    const row = tableBody.insertRow();
+    const timeCell = row.insertCell(0);
+    const waveHeightCell = row.insertCell(1);
+
+    timeCell.textContent = time;
+    waveHeightCell.textContent = `${waveHeights[index]} m`;
+  });
+}
+
+// Initial fetch for location data
+fetchLocationData();
