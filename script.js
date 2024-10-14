@@ -1,7 +1,7 @@
 var latitude = 3.0425383902202046;
 var longitude = 100.40256180187565;
 
-var map = L.map('map').setView([latitude, longitude], 10); // Inisialisasi peta
+var map = L.map('map').setView([latitude, longitude], 8); // Inisialisasi peta
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
