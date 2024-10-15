@@ -68,9 +68,6 @@ function updateData() {
       map.setView([latitude, longitude], 8); // Update peta
       marker.setLatLng([latitude, longitude]); // Pindahkan marker
 
-      populateForecastTable(marineBerikut adalah lanjutan dari kode JavaScript sebelumnya untuk memastikan peta, warna, dan kategori bahaya ombak diperbarui dengan benar berdasarkan tinggi ombak yang diperoleh dari **Marine API**:
-
-```javascript
       populateForecastTable(marineData.hourly.time, marineData.hourly.wave_height);
     })
     .catch(error => {
